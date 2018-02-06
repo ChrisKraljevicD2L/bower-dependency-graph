@@ -125,19 +125,18 @@ function bowerDeps(prettyJson, csv) {
 		const depender = edge.getNodeStart().getId();
 		const dependee = edge.getNodeEnd().getId();
 		const version = edge.getLabel();
-		jsonDependencies[depender].polymer = version;
-		dependencies[depender].dependsOn[dependee] = version;
+		jsonDependencies[depender].dependsOn[dependee] = version;
 		jsonDependencies[dependee].usedBy[depender] = version;
-		if (dependencies[depender].dependsOn === 'n/a') {
+		if (csvDependencies[depender].dependsOn === 'n/a') {
 			csvDependencies[depender].dependsOn = dependee;
 		} else {
-			dependencies[depender].dependsOn = `${dependencies[depender].dependsOn} ${dependee}`;
+			csvDependencies[depender].dependsOn = `${csvDependencies[depender].dependsOn} ${dependee}`;
 		}
 
-		if (dependencies[dependee].usedBy === 'n/a') {
-			dependencies[dependee].usedBy = depender;
+		if (csvDependencies[dependee].usedBy === 'n/a') {
+			csvDependencies[dependee].usedBy = depender;
 		} else {
-			dependencies[dependee].usedBy = `${dependencies[dependee].usedBy} ${depender}`;
+			csvDependencies[dependee].usedBy = `${csvDependencies[dependee].usedBy} ${depender}`;
 		}
 	});
 
