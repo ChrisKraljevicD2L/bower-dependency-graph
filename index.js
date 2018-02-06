@@ -51,7 +51,7 @@ function bowerDeps(prettyJson, csv) {
 
 	const dependencyGraph = new Graph();
 	const bowerJson = JSON.parse(bowerFile);
-	const packageName = bowerJSON.name;
+	const packageName = bowerJson.name;
 	dependencyGraph.addNode(packageName, packageName);
 
 	const hybridStatus = {};
