@@ -11,7 +11,7 @@ bower-dependency-graph [-p] [-c]
 Options:
   -h, --help		[boolean]
   -p, --pretty-json	[boolean]
-  -c, --csv			[boolean]
+  -c, --csv		[boolean]
 ```
 
 ## Install
