@@ -39,7 +39,7 @@ function createEdgeId(depender, dependee, version) {
 
 function errorOut(errorMessage) {
 	console.error(errorMessage);
-	process.exitCode = 1;
+	process.exit(1);
 }
 
 function bowerDeps(prettyJson, csv) {
@@ -72,8 +72,7 @@ function bowerDeps(prettyJson, csv) {
 	const bowerComponents = fs.existsSync('bower_components') ? fs.readdirSync('bower_components') : null;
 
 	if (!bowerComponents) {
-		console.error('Empty or nonexistent bower_components!');
-		process.exitCode = 1;
+		errorOut('Empty or nonexistent bower_components!');
 	}
 	bowerComponents.forEach(bowerComponent => {
 		const bowerComponentFilePath = `bower_components/${bowerComponent}/bower.json`;
@@ -81,24 +80,20 @@ function bowerDeps(prettyJson, csv) {
 			? fs.readFileSync(bowerComponentFilePath)
 			: null;
 
-		if (!bowerComponentFile) {
-			console.error(`Empty or nonexistent ${bowerComponentFilePath}!`);
-			process.exitCode = 1;
-		}
-		const bowerComponentJson = JSON.parse(bowerComponentFile);
-		isHybrid = bowerComponentJson.variants && bowerComponentJson.variants['1.x'] && bowerComponentJson.variants['1.x'].dependencies && bowerComponentJson.variants['1.x'].dependencies.polymer;
-		hybridStatus[bowerComponent] = isHybrid ? 'probs' : 'no';
-		if (!dependencyGraph.isNode(bowerComponent)) {
-			dependencyGraph.addNode(bowerComponent, bowerComponent);
-		}
-		for (const dependencyName in bowerComponentJson.dependencies) {
-			if (!dependencyGraph.isNode(dependencyName)) {
-				dependencyGraph.addNode(dependencyName, dependencyName);
+		if (bowerComponentFile) {
+			const bowerComponentJson = JSON.parse(bowerComponentFile);
+			if (!dependencyGraph.isNode(bowerComponent)) {
+				dependencyGraph.addNode(bowerComponent, bowerComponent);
 			}
-			const dependencyVersion = bowerComponentJson.dependencies[dependencyName];
-			const edgeId = createEdgeId(bowerComponent, dependencyName, dependencyVersion);
-			if (!dependencyGraph.isEdge(edgeId)) {
-				dependencyGraph.addEdge(bowerComponent, dependencyName, edgeId, 0, dependencyVersion);
+			for (const dependencyName in bowerComponentJson.dependencies) {
+				if (!dependencyGraph.isNode(dependencyName)) {
+					dependencyGraph.addNode(dependencyName, dependencyName);
+				}
+				const dependencyVersion = bowerComponentJson.dependencies[dependencyName];
+				const edgeId = createEdgeId(bowerComponent, dependencyName, dependencyVersion);
+				if (!dependencyGraph.isEdge(edgeId)) {
+					dependencyGraph.addEdge(bowerComponent, dependencyName, edgeId, 0, dependencyVersion);
+				}
 			}
 		}
 	});
@@ -115,8 +110,7 @@ function bowerDeps(prettyJson, csv) {
 		};
 		jsonDependencies[dependency] = {
 			dependsOn: {},
-			usedBy: {},
-			hybrid: hybridStatus[dependency]
+			usedBy: {}
 		}
 
 	});
@@ -141,7 +135,8 @@ function bowerDeps(prettyJson, csv) {
 	});
 
 	if (csv) {
-		fs.writeFileSync('bower-dependencies.csv', convertArrayOfObjectsToCSV(Object.values(csvDependencies)));
+		const csvDependenciesArray = Object.keys(csvDependencies).map(dependency => csvDependencies[dependency]);
+		fs.writeFileSync('bower-dependencies.csv', convertArrayOfObjectsToCSV(csvDependenciesArray));
 	}
 	if (prettyJson) {
 		fs.writeFileSync('bower-dependencies.txt', prettyjson.render(jsonDependencies, {noColor: true}));
