@@ -1,0 +1,21 @@
+#!/usr/bin.env node
+'use strict';
+
+const bowerDeps = require('../');
+
+const cmd = 'bower-dependency-graph';
+
+const argv = require('yargs')
+	.usage(`${cmd} -p -c`)
+	.example(`${cmd} -p`)
+	.example(`${cmd} -c`)
+	.boolean('p')
+	.boolean('c')
+	.alias('p', 'pretty-json')
+	.alias('c', 'csv')
+	.help('h')
+	.alias('h', 'help')
+	.epilog('Print out and/or visualize bower dependnecy information in a graph')
+	.argv;
+
+bowerDeps(argv.p, argv.c);

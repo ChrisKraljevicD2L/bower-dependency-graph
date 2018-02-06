@@ -1,0 +1,37 @@
+{
+  "name": "bower-dependency-graph",
+  "version": "0.0.1",
+  "description": "A tool for printing out and visualizing detailed bower dependency information",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "bin": {
+    "bower-dependency-graph": "./bin/bower-dependency-graph"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ChrisKraljevicD2L/bower-dependency-graph.git"
+  },
+  "keywords": [
+    "bower",
+    "dependencies",
+    "graph",
+    "visualization"
+  ],
+  "author": "Chris Kraljevic",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ChrisKraljevicD2L/bower-dependency-graph/issues"
+  },
+  "homepage": "https://github.com/ChrisKraljevicD2L/bower-dependency-graph#readme",
+  "dependencies": {
+    "graph-js": "git://github.com/ChrisKraljevicD2L/graph-js.git#7b6998cfdbbe905e24655e8b25fea3cd72067d43",
+    "prettyjson": "^1.2.1",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-brightspace": "^0.4.0"
+  }
+}
