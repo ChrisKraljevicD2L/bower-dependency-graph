@@ -1,11 +1,9 @@
 {
   "name": "bower-dependency-graph",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A tool for printing out and visualizing detailed bower dependency information",
   "main": "index.js",
-  "scripts": {
-    "test": "npm run test"
-  },
+  "scripts": {},
   "bin": {
     "bower-dependency-graph": "./bin/bower-dependency-graph"
   },
