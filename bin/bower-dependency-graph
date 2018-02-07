@@ -6,16 +6,18 @@ const bowerDeps = require('../');
 const cmd = 'bower-dependency-graph';
 
 const argv = require('yargs')
-	.usage(`${cmd} -p -c`)
+	.usage(`${cmd} -p -c -o`)
 	.example(`${cmd} -p`)
 	.example(`${cmd} -c`)
 	.boolean('p')
 	.boolean('c')
+	.boolean('o')
 	.alias('p', 'pretty-json')
 	.alias('c', 'csv')
+	.alias('o', 'polymer-info')
 	.help('h')
 	.alias('h', 'help')
 	.epilog('Print out and/or visualize bower dependnecy information in a graph')
 	.argv;
 
-bowerDeps(argv.p, argv.c);
+bowerDeps(argv.p, argv.c, argv.o);

@@ -42,7 +42,7 @@ function errorOut(errorMessage) {
 	process.exit(1);
 }
 
-function bowerDeps(prettyJson, csv) {
+function bowerDeps(prettyJson, csv, polymerInfo) {
 	const bowerFile = fs.existsSync('bower.json') ? fs.readFileSync('bower.json') : null;
 
 	if (!bowerFile) {
@@ -55,9 +55,13 @@ function bowerDeps(prettyJson, csv) {
 	dependencyGraph.addNode(packageName, packageName);
 
 	const hybridStatus = {};
-	let isHybrid = bowerJson.variants && bowerJson.variants['1.x'] && bowerJson.variants['1.x'].dependencies && bowerJson.variants['1.x'].dependencies.polymer;
+	let isHybrid = bowerJson
+				&& bowerJson.variants
+				&& bowerJson.variants['1.x']
+				&& bowerJson.variants['1.x'].dependencies
+				&& bowerJson.variants['1.x'].dependencies.polymer;
 
-	hybridStatus[packageName] = isHybrid ? 'probs' : 'no';
+	hybridStatus[packageName] = isHybrid ? 'yes' : 'no';
 	for (const dependencyName in bowerJson.dependencies) {
 		if (!dependencyGraph.isNode(dependencyName)) {
 			dependencyGraph.addNode(dependencyName, dependencyName);
@@ -82,6 +86,12 @@ function bowerDeps(prettyJson, csv) {
 
 		if (bowerComponentFile) {
 			const bowerComponentJson = JSON.parse(bowerComponentFile);
+			isHybrid = bowerComponentJson
+					&& bowerComponentJson.variants
+					&& bowerComponentJson.variants['1.x']
+					&& bowerComponentJson.variants['1.x'].dependencies
+					&& bowerComponentJson.variants['1.x'].dependencies.polymer;
+			hybridStatus[bowerComponent] = isHybrid ? 'yes' : 'no';
 			if (!dependencyGraph.isNode(bowerComponent)) {
 				dependencyGraph.addNode(bowerComponent, bowerComponent);
 			}
@@ -103,34 +113,48 @@ function bowerDeps(prettyJson, csv) {
 
 	dependencyGraph.getNodes().forEach(node => {
 		const dependency = node.getId();
-		csvDependencies[dependency] = {
-			name: dependency,
-			dependsOn: 'n/a',
-			usedBy: 'n/a'
-		};
-		jsonDependencies[dependency] = {
-			dependsOn: {},
-			usedBy: {}
+		if (dependency !== 'polymer' || !polymerInfo) {
+			csvDependencies[dependency] = {
+				name: dependency,
+				dependsOn: 'n/a',
+				usedBy: 'n/a'
+			};
+			jsonDependencies[dependency] = {
+				dependsOn: {},
+				usedBy: {}
+			};
+			if (polymerInfo) {
+				csvDependencies[dependency].polymer = 'n/a';
+				csvDependencies[dependency].hybrid = hybridStatus[dependency];
+				jsonDependencies[dependency].polymer = 'n/a';
+				jsonDependencies[dependency].hybrid = hybridStatus[dependency];
+			}
 		}
-
 	});
 
 	dependencyGraph.getEdges().forEach(edge => {
 		const depender = edge.getNodeStart().getId();
 		const dependee = edge.getNodeEnd().getId();
 		const version = edge.getLabel();
-		jsonDependencies[depender].dependsOn[dependee] = version;
-		jsonDependencies[dependee].usedBy[depender] = version;
-		if (csvDependencies[depender].dependsOn === 'n/a') {
-			csvDependencies[depender].dependsOn = dependee;
-		} else {
-			csvDependencies[depender].dependsOn = `${csvDependencies[depender].dependsOn} ${dependee}`;
-		}
+		if (depender !== 'polymer' || !polymerInfo) {
+			if (dependee !== 'polymer' || !polymerInfo) {
+				jsonDependencies[depender].dependsOn[dependee] = version;
+				jsonDependencies[dependee].usedBy[depender] = version;
+				if (csvDependencies[depender].dependsOn === 'n/a') {
+					csvDependencies[depender].dependsOn = dependee;
+				} else {
+					csvDependencies[depender].dependsOn = `${csvDependencies[depender].dependsOn} ${dependee}`;
+				}
 
-		if (csvDependencies[dependee].usedBy === 'n/a') {
-			csvDependencies[dependee].usedBy = depender;
-		} else {
-			csvDependencies[dependee].usedBy = `${csvDependencies[dependee].usedBy} ${depender}`;
+				if (csvDependencies[dependee].usedBy === 'n/a') {
+					csvDependencies[dependee].usedBy = depender;
+				} else {
+					csvDependencies[dependee].usedBy = `${csvDependencies[dependee].usedBy} ${depender}`;
+				}
+			} else {
+				jsonDependencies[depender].polymer = version;
+				csvDependencies[depender].polymer = version;
+			}
 		}
 	});
 
