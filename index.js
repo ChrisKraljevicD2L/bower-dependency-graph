@@ -61,7 +61,11 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 				&& bowerJson.variants['1.x'].dependencies
 				&& bowerJson.variants['1.x'].dependencies.polymer;
 
-	hybridStatus[packageName] = isHybrid ? 'yes' : 'no';
+	let isPolymer = bowerJson
+				&& bowerJson.dependencies
+				&& bowerJson.dependencies.polymer;
+
+	hybridStatus[packageName] = isPolymer ? (isHybrid ? 'yes' : 'no') : 'n/a';
 	for (const dependencyName in bowerJson.dependencies) {
 		if (!dependencyGraph.isNode(dependencyName)) {
 			dependencyGraph.addNode(dependencyName, dependencyName);
@@ -91,7 +95,10 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 					&& bowerComponentJson.variants['1.x']
 					&& bowerComponentJson.variants['1.x'].dependencies
 					&& bowerComponentJson.variants['1.x'].dependencies.polymer;
-			hybridStatus[bowerComponent] = isHybrid ? 'yes' : 'no';
+			isPolymer = bowerComponentJson
+					&& bowerComponentJson.dependencies
+					&& bowerComponentJson.dependencies.polymer;
+			hybridStatus[bowerComponent] = isPolymer ? (isHybrid ? 'yes' : 'no') : 'n/a';
 			if (!dependencyGraph.isNode(bowerComponent)) {
 				dependencyGraph.addNode(bowerComponent, bowerComponent);
 			}
@@ -124,9 +131,9 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 				usedBy: {}
 			};
 			if (polymerInfo) {
-				csvDependencies[dependency].polymer = 'n/a';
+				csvDependencies[dependency].polymer = 'no';
 				csvDependencies[dependency].hybrid = hybridStatus[dependency];
-				jsonDependencies[dependency].polymer = 'n/a';
+				jsonDependencies[dependency].polymer = 'no';
 				jsonDependencies[dependency].hybrid = hybridStatus[dependency];
 			}
 		}
