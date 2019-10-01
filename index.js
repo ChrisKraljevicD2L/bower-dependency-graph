@@ -49,6 +49,11 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 		errorOut('Empty or nonexistent bower.json!');
 	}
 
+	const bowerRCFile = fs.existsSync('.bowerrc') ? fs.readFileSync('.bowerrc') : null;
+	const bowerRCJson = JSON.parse(bowerRCFile);
+
+	const bowerComponentsPath = bowerRCJson.directory ? bowerRCJson.directory : 'bower_components';
+
 	const dependencyGraph = new Graph();
 	const bowerJson = JSON.parse(bowerFile);
 	const packageName = bowerJson.name;
@@ -77,7 +82,7 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 		}
 	}
 
-	const bowerComponents = fs.existsSync('bower_components') ? fs.readdirSync('bower_components') : null;
+	const bowerComponents = fs.existsSync(bowerComponentsPath) ? fs.readdirSync(bowerComponentsPath) : null;
 
 	if (!bowerComponents) {
 		errorOut('Empty or nonexistent bower_components!');
