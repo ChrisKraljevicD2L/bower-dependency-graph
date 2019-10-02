@@ -88,7 +88,7 @@ function bowerDeps(prettyJson, csv, polymerInfo) {
 		errorOut('Empty or nonexistent bower_components!');
 	}
 	bowerComponents.forEach(bowerComponent => {
-		const bowerComponentFilePath = `bower_components/${bowerComponent}/bower.json`;
+		const bowerComponentFilePath = `${bowerComponentsPath}/${bowerComponent}/bower.json`;
 		const bowerComponentFile = fs.existsSync(bowerComponentFilePath)
 			? fs.readFileSync(bowerComponentFilePath)
 			: null;
